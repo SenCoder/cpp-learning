@@ -10,12 +10,17 @@ private:
     float m_salary;
 //    初始化 const 成员变量的唯一方法就是使用初始化列表
 //    const int m_sex;
+    static int s_total;
 
 public:
 //    类只是一个模板, 编译后不占用内存空间, 所以类的定义不能对成员进行初始化; 只有对象才可以
     char *m_name;
     int m_age;
     float m_score;
+//    静态成员变量，多个实例共享数据
+//    静态成员变量必须在类外部初始化，而且必须初始化，否在就不会被分配内存空间; 初始化时可以赋值或不赋值
+//    静态成员变量可以通过类或者对象访问，也受类的访问权限控制
+
 
 //    在一个类体中，private 和 public 可以分别出现多次。每个部分的有效范围到出现另一个访问限定符或类体结束时（最后一个右花括号）为止。
 //    但是为了使程序清晰，应该养成这样的习惯，使每一种成员访问限定符在类定义体中只出现一次。
@@ -33,29 +38,46 @@ public:
 //    析构函数没有参数，不能被重载，因此一个类只能有一个析构函数。如果用户没有定义，编译器会自动生成一个默认的析构函数
     ~Student();
 
-    void say() {
+//    const 成员函数可以访问成员变量，但不能修改成员变量的值
+    void say() const {
         using namespace std;
-        cout << "student: " << m_name << " " << m_age << " " << m_score << " " << m_salary << endl;
+        cout << "student: " << m_name << " " << m_age << " " << m_score << " " << m_salary;
+//        static 成员变量的内存不是在声明类的时候分配，也不是在对象创建时分配，而是在类外初始化时分配
+//        即使类没有实例化， static 成员变量也可以访问，它就想一个全局变量，内存分配独在全局数据区
+        cout << " total: " << s_total << endl;
     }
 
     void set_salary(float salary);
+
+//    静态成员函数只能访问静态成员，不能访问 this 指针或非静态成员变量/函数
+    static int get_total();
+
+//    声明非成员函数为友元函数
+//    允许函数 exam 访问 Student 的私有成员
+//    还可以使用 friend class 声明友元类
+//    友元的关系时单向的; 友元关系不能传递
+    friend void exam(Student *p);
 };
 
 Student::Student() {
-
+    s_total++;
 }
 
 Student::Student(char *name, int age, float score) {
     m_name = name;
     m_age = age;
     m_score = score;
+    s_total++;
 }
 
 //采用初始化列表
 //成员变量的初始化顺序与初始化列表中列出的变量的顺序无关，它只与成员变量在类中声明的顺序有关
 Student::Student(char *name, int age) : m_name(name), m_age(age) {
     //TODO:
+    s_total++;
 }
+
+int Student::s_total = 0;
 
 void Student::set_salary(float salary) {
 //    this 是 C++ 中的一个关键字，也是一个 const 指针，它指向当前对象，通过它可以访问当前对象的所有成员。
@@ -66,19 +88,47 @@ void Student::set_salary(float salary) {
     this->m_salary = salary;
 }
 
-Student::~Student() {
-
+int Student::get_total() {
+    return s_total;
 }
 
+Student::~Student() {
+    s_total--;
+}
+
+void exam(Student *p) {
+    using namespace std;
+    cout << p->m_name << " " << p->m_salary << endl;
+}
+
+// 提前声明类
+class School;
+
 class Graduate {
+private:
+    const int m_sex;
 public:
-    char *name;
-    int age;
-    float score;
+    char *m_name;
+    int m_age;
+    float m_score;
+
+    Graduate(char * name, int sex);
 
     // 成员方法在类内声明，但在类外实现
     void say();
+    void info(School *sgl);
 };
+
+class School {
+private:
+    char *m_name;
+    char *m_address;
+    // 允许类 Graduate 的 info 方法访问 school 的 private/protected/public 属性
+    friend void Graduate::info(School *sgl);
+public:
+    School(char * name, char * m_address);
+};
+
 
 //类外实现的成员函数必须加上类名
 //域解析符（也称作用域运算符或作用域限定符），用来连接类名和函数名，指明当前函数属于哪个类
@@ -87,7 +137,21 @@ public:
 //如果希望类外实现的函数变成内联函数，可以添加 inline 关键字
 void Graduate::say() {
     using namespace std;
-    cout << "graduate: " << name << " " << age << score << endl;
+    cout << "graduate: " << m_name << " sex: " << m_sex << " age: " << m_age;
+    cout << " score: " << m_score << endl;
+}
+
+Graduate::Graduate(char * name, int sex) : m_sex(sex) {
+    this->m_name = name;
+}
+
+void Graduate::info(School *sgl) {
+    using namespace std;
+    cout << "graduate: " << m_name << " school: " <<  sgl->m_address << " " << sgl->m_name <<endl;
+}
+
+School::School(char *name, char *address) : m_name(name), m_address(address) {
+
 }
 
 //在类体外定义 inline 函数的方式，必须将类的定义和成员函数的定义都放在同一个头文件中（或者同一个源文件中），否则编译时无法进行嵌入
@@ -98,15 +162,17 @@ void Graduate::say() {
 
 
 void makeStudent(char *name, int age, float score) {
+    using namespace std;
 //    class Student mary; 也是 OK 的
-    // 创建对象
+//    创建对象
     Student mary;
     mary.m_name = name;
     mary.m_age = age;
     mary.m_score = score;
     mary.set_salary(36000);
     mary.say();
-    // 创建对象数组
+
+//     创建对象数组
 //    Student studs[100];
 
 //    在堆上创建对象，对内存需要程序员自行管理
@@ -115,7 +181,28 @@ void makeStudent(char *name, int age, float score) {
     peter->m_name = (char *) "peter";
     peter->m_age = 13;
     peter->m_score = 97;
+    peter->set_salary(19000);
     peter->say();
+    exam(peter);
 //    释放内存，否则会内存泄露
     delete peter;
+//    cout << "total: " << Student::get_total() << endl;
+
+//    const 对象一旦初始化后不允许修改
+    const class Student tidy((char *) "tidy", 11, 96);
+    tidy.say();
+
+    Graduate g((char *)"sunny", 1);
+    School sgl((char *)"Hang Xinglu school", (char *)"Zhejiang Yuhang Liangzhu");
+    g.say();
+    g.info(&sgl);
+
+//    通过基类指针只能访问派生类的成员变量，不能访问派生类的成员函数; 为了消除这种尴尬, C++ 设计了虚函数
+//    基类指针指向基类对象就使用基类的成员，指向派生类的对象，就使用派生类的成员，他有多种形态和表现方式，我们称之为多态
+//    C++ 中虚函数的作用就是构成多态
+//    构造函数不能声明为虚函数；虚函数必须实现，否则编译会报错
+//    纯虚函数的声明如下：
+//    virtual void function1()=0;
+//    如果类包含纯虚函数，这个类就称为抽象类。抽象类一般作为基类使用，无法被实例化，类似于接口。
+//    纯虚函数的作用类似于接口，用来规范子类的行为。
 }

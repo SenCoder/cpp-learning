@@ -3,4 +3,4 @@ project(cpp_learning)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(cpp_learning main.cpp oop.cpp oop.h)
+add_executable(cpp_learning main.cpp oop.cpp oop.h string.cpp string.h)

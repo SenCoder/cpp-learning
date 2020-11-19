@@ -2,6 +2,7 @@
 #include <cstdio>  // cstdio/cstdlib 位于 std 命名空间； stdio.h/stdlib.h 等没有命名空间，位于全局作用域
 #include <string>
 #include "oop.h"
+#include "string.h"
 
 // 如果希望在所有函数中使用 std 命名空间，可以在这里添加，更方便; 但在大型项目中，不推荐这样做
 // using namespace std;
@@ -57,5 +58,6 @@ int main() {
 
 //    char *name = "mary";
     makeStudent((char*)"mary", 12, 98.5);
+    makeString();
     return 0;
 }
