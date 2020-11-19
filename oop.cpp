@@ -50,6 +50,7 @@ public:
     void set_salary(float salary);
 
 //    静态成员函数只能访问静态成员，不能访问 this 指针或非静态成员变量/函数
+//    普通函数也可被 static 关键字修饰，其特点是: 静态函数不能被其它文件所用；其它文件中可以定义相同名字的函数，不会发生冲突；
     static int get_total();
 
 //    声明非成员函数为友元函数
