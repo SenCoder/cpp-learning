@@ -5,6 +5,6 @@
 #ifndef CPP_LEARNING_STRING_H
 #define CPP_LEARNING_STRING_H
 
-void makeString();
+void make_string();
 
 #endif //CPP_LEARNING_STRING_H

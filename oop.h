@@ -5,6 +5,6 @@
 #ifndef CPP_LEARNING_OOP_H
 #define CPP_LEARNING_OOP_H
 
-void makeStudent(char *name, int age, float score);
+void make_student(char *name, int age, float score);
 
 #endif //CPP_LEARNING_OOP_H

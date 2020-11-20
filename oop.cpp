@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <string>
 
 class Student {
 private:
@@ -29,14 +30,12 @@ public:
 //    如果用户自己没有定义构造函数，那么编译器会自动生成一个默认的构造函数，只是这个构造函数的函数体是空的，也没有形参，也不执行任何操作
 //    构造函数必须是 public 属性的，否则创建对象时无法调用。当然，设置为 private、protected 属性也不会报错，但是没有意义
     Student();
-
     Student(char *name, int age, float score);
-
     Student(char *name, int age);
 
 //    析构函数（Destructor）也是一种特殊的成员函数，没有返回值，不需要程序员显式调用（程序员也没法显式调用），而是在销毁对象时自动执行
 //    析构函数没有参数，不能被重载，因此一个类只能有一个析构函数。如果用户没有定义，编译器会自动生成一个默认的析构函数
-    ~Student();
+    virtual ~Student();
 
 //    const 成员函数可以访问成员变量，但不能修改成员变量的值
     void say() const {
@@ -58,6 +57,9 @@ public:
 //    还可以使用 friend class 声明友元类
 //    友元的关系时单向的; 友元关系不能传递
     friend void exam(Student *p);
+
+    void say_hello();
+    void say_goodbye();
 };
 
 Student::Student() {
@@ -93,8 +95,52 @@ int Student::get_total() {
     return s_total;
 }
 
+void Student::say_hello() {
+    using std::cout;
+    using std::endl;
+    cout << "hello hello ..." << endl;
+}
+
+void Student::say_goodbye() {
+    using std::cout;
+    using std::endl;
+    cout << "goodbye ";
+}
+
 Student::~Student() {
+    using std::cout;
+    using std::endl;
     s_total--;
+    cout<< m_name << ": student destructed" <<endl;
+}
+
+class SeniorStudent : public Student {
+public:
+    using Student::say_goodbye;
+    SeniorStudent(char *name, int age, float score):Student(name, age, score){};
+    ~SeniorStudent() {
+        using std::cout;
+        using std::endl;
+        cout<< m_name << ": senior student destructed" <<endl;
+    };
+
+    void say_hello();
+    void say_goodbye(std::string someone);
+};
+
+void SeniorStudent::say_hello() {
+//    子类中调用父类方法
+    using std::cout;
+    cout << "I am " << this->m_name << ", ";
+    Student::say_hello();
+}
+
+void SeniorStudent::say_goodbye(std::string someone) {
+    using std::cout;
+    using std::endl;
+
+    Student::say_goodbye();
+    cout<< someone << endl;
 }
 
 void exam(Student *p) {
@@ -162,7 +208,8 @@ School::School(char *name, char *address) : m_name(name), m_address(address) {
 //}
 
 
-void makeStudent(char *name, int age, float score) {
+void make_student(char *name, int age, float score) {
+
     using namespace std;
 //    class Student mary; 也是 OK 的
 //    创建对象
@@ -199,11 +246,22 @@ void makeStudent(char *name, int age, float score) {
     g.info(&sgl);
 
 //    通过基类指针只能访问派生类的成员变量，不能访问派生类的成员函数; 为了消除这种尴尬, C++ 设计了虚函数
-//    基类指针指向基类对象就使用基类的成员，指向派生类的对象，就使用派生类的成员，他有多种形态和表现方式，我们称之为多态
-//    C++ 中虚函数的作用就是构成多态
-//    构造函数不能声明为虚函数；虚函数必须实现，否则编译会报错
+//    基类指针指向基类对象就使用基类的成员，指向派生类的对象，就使用派生类的成员。这种基类指针可以有多种形态和表现方式，我们称之为多态
+//    C++ 中虚函数的作用是构成多态
+//    构造函数不能声明为虚函数，析构函数可以是虚函数；虚函数必须实现，否则编译会报错
 //    纯虚函数的声明如下：
 //    virtual void function1()=0;
 //    如果类包含纯虚函数，这个类就称为抽象类。抽象类一般作为基类使用，无法被实例化，类似于接口。
 //    纯虚函数的作用类似于接口，用来规范子类的行为。
+//    一般，我们将基类的析构函数声明为虚函数
+
+    SeniorStudent shelly((char *) "shelly", 8, 100);
+    shelly.say_hello();
+    shelly.say_goodbye("sunny");
+
+//    基类中采用的是非虚析构函数，当删除基类指针指向的派生类对象时就不会触发动态绑定，因而只会调用基类的析构函数，而不会调用派生类的析构函数。
+//    如果派生类中申请了内存空间，并在析构函数中释放，这种情况因为派生类虚函数未调用，会产生内存泄露。
+//    为了防止这种情况的发生，C++中基类的析构函数应采用virtual虚析构函数。
+    Student *anna = new SeniorStudent((char *) "anna", 8, 98);
+    delete anna;
 }

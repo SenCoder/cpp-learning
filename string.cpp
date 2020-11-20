@@ -13,7 +13,7 @@
 
 //C++ 增强了对 string 的支持，内置了 string 类, 用来替换 C 中的字符数组或字符串指针
 
-void makeString() {
+void make_string() {
     using namespace std;
     string s1;
     string s2 = "hello, string";

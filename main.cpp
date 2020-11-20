@@ -3,6 +3,7 @@
 #include <string>
 #include "oop.h"
 #include "string.h"
+#include "stl.h"
 
 // 如果希望在所有函数中使用 std 命名空间，可以在这里添加，更方便; 但在大型项目中，不推荐这样做
 // using namespace std;
@@ -57,7 +58,16 @@ int main() {
 //    重载仅仅是语法方面的方便，事实上在编译的时候，多个重载函数的名称会依据类型不同而被替换
 
 //    char *name = "mary";
-    makeStudent((char*)"mary", 12, 98.5);
-    makeString();
+//
+//  C++  auto 的原理就是根据后面的值，来自己推测前面的类型是什么
+//    用auto声明的变量必须初始化
+//    函数和模板参数不能被声明为auto
+//    因为auto是一个占位符，并不是一个他自己的类型，因此不能用于类型转换或其他一些操作，如sizeof和typeid
+//    定义在一个auto序列的变量必须始终推导成同一类型; 错误示例: auto x1 = 5, x2 = 5.0, x3='r';
+
+    make_student((char *) "mary", 12, 98.5);
+    make_string();
+    swap_everything();
+    make_point();
     return 0;
 }
