@@ -28,5 +28,13 @@ void make_string() {
     cout << s2 << endl;
 
     // string 可以和 char* char[] string 通过 + 运算进行字符串拼接
-
 }
+
+// using 用法总结
+// 1）配合命名空间，对命名空间权限进行管理
+// using namespace std; //释放整个命名空间到当前作用域
+// using std::cout;    //释放某个变量到当前作用域
+// 2) 类型重命名
+// 作用等同typedef，但是逻辑上更直观。
+typedef std::string TString;   //! 使用typedef的方式
+using Ustring = std::string;   //！使用 using typeName_self = stdtypename;
